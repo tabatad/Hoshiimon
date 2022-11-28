@@ -5,12 +5,15 @@
 
     <data>
 
+        <variable
+            name="homeViewModel"
+            type="com.tabata.hoshiimon.home.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".HomeFragment">
+        tools:context=".home.HomeFragment">
 
         <TextView
             android:layout_width="wrap_content"
