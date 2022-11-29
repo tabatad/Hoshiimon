@@ -3,7 +3,7 @@ package com.tabata.hoshiimon.database
 import android.content.Context
 import androidx.room.*
 
-@Database(entities = [Item::class, Group::class, Value::class], version = 1)
+@Database(entities = [Item::class, Group::class, Value::class], version = 1, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract val dao: AppDao

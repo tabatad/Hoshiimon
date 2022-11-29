@@ -4,16 +4,16 @@ import androidx.room.*
 
 @Entity
 data class Item(
-    @PrimaryKey(autoGenerate = true) val itemId: Long,
-    val itemName: String,
-    val price: Long
+    @PrimaryKey(autoGenerate = true) val itemId: Long = 0,
+    val itemName: String?,
+    val price: Long?
 )
 
 @Entity
 data class Group(
-    @PrimaryKey(autoGenerate = true) val groupId: Long,
-    val groupName: String,
-    val higherGroupId: Long
+    @PrimaryKey(autoGenerate = true) val groupId: Long = 0,
+    val groupName: String?,
+    val higherGroupId: Long?
 )
 
 @Entity(
@@ -30,10 +30,14 @@ data class Group(
             childColumns = arrayOf("groupId"),
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index("itemId"),
+        Index("groupId")
     ]
 )
 data class Value(
-    @PrimaryKey(autoGenerate = true) val valueId: Long,
+    @PrimaryKey(autoGenerate = true) val valueId: Long = 0,
     val itemId: Long,
     val groupId: Long
 )
