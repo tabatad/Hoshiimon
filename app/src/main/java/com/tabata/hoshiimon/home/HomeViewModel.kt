@@ -2,6 +2,8 @@ package com.tabata.hoshiimon.home
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tabata.hoshiimon.database.AppDao
 import com.tabata.hoshiimon.database.Group
@@ -15,6 +17,10 @@ class HomeViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    private val _dataSet = MutableLiveData<List<Group>>()
+    val dataSet: LiveData<List<Group>>
+        get() = _dataSet
+
     init {
         Timber.plant(Timber.DebugTree())
 
@@ -25,7 +31,19 @@ class HomeViewModel(
         }
     }
 
-    fun setDefaultDB() {
+    fun getDefaultGroup() {
+        viewModelScope.launch {
+            _dataSet.value = database.getRootGroups()
+        }
+    }
+
+    fun getHigherGroup(group: Group) {
+        viewModelScope.launch {
+            _dataSet.value = database.getHigherGroup(group.groupId)
+        }
+    }
+
+    private fun setDefaultDB() {
         viewModelScope.launch {
             database.itemInsert(Item(itemName = "12600k", price = 200))
             database.itemInsert(Item(itemName = "12900k", price = 500))
@@ -53,17 +71,6 @@ class HomeViewModel(
             database.valueInsert(Value(itemId = 9, groupId = 4))
 
             Timber.i("default insert completed")
-        }
-    }
-
-    fun select() {
-        viewModelScope.launch {
-            val item = database.selectItem()
-            if (item != null) {
-                Timber.i("select completed name:${item.itemName} price:${item.price}")
-            } else {
-                Timber.i("select completed, but empty")
-            }
         }
     }
 }

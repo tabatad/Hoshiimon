@@ -13,6 +13,12 @@ interface AppDao {
     @Insert
     suspend fun valueInsert(value: Value)
 
-    @Query("SELECT * FROM item WHERE itemId = 1 LIMIT 1")
+    @Query("SELECT * FROM item LIMIT 1")
     suspend fun selectItem(): Item?
+
+    @Query("SELECT * FROM 'group' WHERE higherGroupId IS NULL")
+    suspend fun getRootGroups(): List<Group>
+
+    @Query("SELECT * FROM 'group' WHERE higherGroupId = :groupId")
+    suspend fun getHigherGroup(groupId: Long?): List<Group>
 }
