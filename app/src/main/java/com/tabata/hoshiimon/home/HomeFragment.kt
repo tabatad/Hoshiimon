@@ -50,6 +50,7 @@ class HomeFragment : Fragment() {
             listViewAdapter?.setOnItemClickListener(
                 object : GroupListViewAdapter.OnItemClickListener {
                     override fun onItemClick(group: Group) {
+                        setGroupName(group)
                         homeViewModel.getHigherGroup(group)
                         homeViewModel.getItemsByGroupId(group)
                     }
@@ -64,5 +65,9 @@ class HomeFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    fun setGroupName(group: Group) {
+        binding.groupName.text = group.groupName
     }
 }
