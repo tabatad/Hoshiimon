@@ -27,4 +27,7 @@ interface AppDao {
 
     @Query("SELECT itemId, itemName, price FROM item NATURAL JOIN 'group' NATURAL JOIN value WHERE groupId = :groupId")
     suspend fun getItemsByGroupId(groupId: Long?): List<Item>
+
+    @Query("SELECT * FROM item WHERE itemId = :itemId")
+    suspend fun getItemByItemId(itemId: Long?): Item
 }

@@ -2,16 +2,20 @@ package com.tabata.hoshiimon.home
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.icu.lang.UCharacter.GraphemeClusterBreak.L
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tabata.hoshiimon.database.AppDatabase
 import com.tabata.hoshiimon.database.Group
+import com.tabata.hoshiimon.database.Item
 import com.tabata.hoshiimon.databinding.FragmentHomeBinding
 import timber.log.Timber
 
@@ -66,6 +70,16 @@ class HomeFragment : Fragment() {
             val dataSet = homeViewModel.itemDataSet.value
             val listViewAdapter = dataSet?.let { ItemListViewAdapter(it) }
             itemListView.adapter = listViewAdapter
+            listViewAdapter?.setOnItemClickListener(
+                object : ItemListViewAdapter.OnItemClickListener {
+                    override fun onItemClick(item: Item) {
+                        findNavController().navigate(
+                            HomeFragmentDirections
+                                .actionHomeFragmentToItemFragment(item.itemId)
+                        )
+                    }
+                }
+            )
         }
 
         homeViewModel.currentGroup.observe(viewLifecycleOwner) {
