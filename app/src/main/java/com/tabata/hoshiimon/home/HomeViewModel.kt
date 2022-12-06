@@ -17,9 +17,13 @@ class HomeViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val _dataSet = MutableLiveData<List<Group>>()
-    val dataSet: LiveData<List<Group>>
-        get() = _dataSet
+    private val _groupDataSet = MutableLiveData<List<Group>>()
+    val groupDataSet: LiveData<List<Group>>
+        get() = _groupDataSet
+
+    private val _itemDataSet = MutableLiveData<List<Item>>()
+    val itemDataSet: LiveData<List<Item>>
+        get() = _itemDataSet
 
     init {
         Timber.plant(Timber.DebugTree())
@@ -33,13 +37,19 @@ class HomeViewModel(
 
     fun getDefaultGroup() {
         viewModelScope.launch {
-            _dataSet.value = database.getRootGroups()
+            _groupDataSet.value = database.getRootGroups()
         }
     }
 
     fun getHigherGroup(group: Group) {
         viewModelScope.launch {
-            _dataSet.value = database.getHigherGroup(group.groupId)
+            _groupDataSet.value = database.getLowerGroup(group.groupId)
+        }
+    }
+
+    fun getItemsByGroupId(group: Group) {
+        viewModelScope.launch {
+            _itemDataSet.value = database.getItemsByGroupId(group.groupId)
         }
     }
 

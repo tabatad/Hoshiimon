@@ -3,20 +3,19 @@ package com.tabata.hoshiimon.home
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tabata.hoshiimon.R
 import com.tabata.hoshiimon.database.Group
 
-class ListViewAdapter(private val dataSet: List<Group>):
-    RecyclerView.Adapter<ListViewAdapter.ViewHolder>() {
+class GroupListViewAdapter(private val dataSet: List<Group>):
+    RecyclerView.Adapter<GroupListViewAdapter.ViewHolder>() {
 
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val groupName: TextView
 
         init {
-            groupName = view.findViewById(R.id.item_list_group_name)
+            groupName = view.findViewById(R.id.name_list)
         }
     }
 

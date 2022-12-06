@@ -20,5 +20,8 @@ interface AppDao {
     suspend fun getRootGroups(): List<Group>
 
     @Query("SELECT * FROM 'group' WHERE higherGroupId = :groupId")
-    suspend fun getHigherGroup(groupId: Long?): List<Group>
+    suspend fun getLowerGroup(groupId: Long?): List<Group>
+
+    @Query("SELECT itemId, itemName, price FROM item NATURAL JOIN 'group' NATURAL JOIN value WHERE groupId = :groupId")
+    suspend fun getItemsByGroupId(groupId: Long?): List<Item>
 }

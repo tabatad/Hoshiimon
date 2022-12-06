@@ -36,20 +36,31 @@ class HomeFragment : Fragment() {
         binding.groupName.text = getString(R.string.home)
 
         homeViewModel.getDefaultGroup()
+
+        val groupListView = binding.groupListView
+        groupListView.layoutManager = LinearLayoutManager(requireContext())
+
         val itemListView = binding.itemListView
         itemListView.layoutManager = LinearLayoutManager(requireContext())
 
-        homeViewModel.dataSet.observe(viewLifecycleOwner) {
-            val dataSet = homeViewModel.dataSet.value
-            val listViewAdapter = dataSet?.let { ListViewAdapter(it) }
-            itemListView.adapter = listViewAdapter
+        homeViewModel.groupDataSet.observe(viewLifecycleOwner) {
+            val dataSet = homeViewModel.groupDataSet.value
+            val listViewAdapter = dataSet?.let { GroupListViewAdapter(it) }
+            groupListView.adapter = listViewAdapter
             listViewAdapter?.setOnItemClickListener(
-                object : ListViewAdapter.OnItemClickListener {
+                object : GroupListViewAdapter.OnItemClickListener {
                     override fun onItemClick(group: Group) {
                         homeViewModel.getHigherGroup(group)
+                        homeViewModel.getItemsByGroupId(group)
                     }
                 }
             )
+        }
+
+        homeViewModel.itemDataSet.observe(viewLifecycleOwner) {
+            val dataSet = homeViewModel.itemDataSet.value
+            val listViewAdapter = dataSet?.let { ItemListViewAdapter(it) }
+            itemListView.adapter = listViewAdapter
         }
 
         return binding.root

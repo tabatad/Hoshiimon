@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/item_list_group_name"
+        android:id="@+id/name_list"
         style="@style/simple_text"
         android:textSize="@dimen/small_text"
         app:layout_constraintStart_toStartOf="parent"
