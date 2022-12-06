@@ -25,6 +25,10 @@ class HomeViewModel(
     val itemDataSet: LiveData<List<Item>>
         get() = _itemDataSet
 
+    private val _currentGroup = MutableLiveData<Group>()
+    val currentGroup: LiveData<Group>
+        get() = _currentGroup
+
     init {
         Timber.plant(Timber.DebugTree())
 
@@ -32,18 +36,19 @@ class HomeViewModel(
             if (database.selectItem() == null) {
                 setDefaultDB()
             }
+            _currentGroup.value = database.getRootGroup()
         }
     }
 
-    fun getDefaultGroup() {
-        viewModelScope.launch {
-            _groupDataSet.value = database.getRootGroups()
-        }
-    }
-
-    fun getHigherGroup(group: Group) {
+    fun getLowerGroup(group: Group) {
         viewModelScope.launch {
             _groupDataSet.value = database.getLowerGroup(group.groupId)
+        }
+    }
+
+    fun getHigherGroup() {
+        viewModelScope.launch {
+            _currentGroup.value = database.getHigherGroup(_currentGroup.value!!.higherGroupId)
         }
     }
 
@@ -53,34 +58,37 @@ class HomeViewModel(
         }
     }
 
-    private fun setDefaultDB() {
-        viewModelScope.launch {
-            database.itemInsert(Item(itemName = "12600k", price = 200))
-            database.itemInsert(Item(itemName = "12900k", price = 500))
-            database.itemInsert(Item(itemName = "5600X", price = 200))
-            database.itemInsert(Item(itemName = "5950X", price = 600))
-            database.itemInsert(Item(itemName = "DDR4 16GB", price = 100))
-            database.itemInsert(Item(itemName = "DDR4 32GB", price = 200))
-            database.itemInsert(Item(itemName = "DDR5 32GB", price = 300))
-            database.itemInsert(Item(itemName = "Bed", price = 200))
-            database.itemInsert(Item(itemName = "Sofa", price = 100))
+    fun setCurrentGroup(group: Group) {
+        _currentGroup.value = group
+    }
 
-            database.groupInsert(Group(groupName = "PC", higherGroupId = null))
-            database.groupInsert(Group(groupName = "CPU", higherGroupId = 1))
-            database.groupInsert(Group(groupName = "RAM", higherGroupId = 1))
-            database.groupInsert(Group(groupName = "House", higherGroupId = null))
+    private suspend fun setDefaultDB() {
+        database.itemInsert(Item(itemName = "12600k", price = 200))
+        database.itemInsert(Item(itemName = "12900k", price = 500))
+        database.itemInsert(Item(itemName = "5600X", price = 200))
+        database.itemInsert(Item(itemName = "5950X", price = 600))
+        database.itemInsert(Item(itemName = "DDR4 16GB", price = 100))
+        database.itemInsert(Item(itemName = "DDR4 32GB", price = 200))
+        database.itemInsert(Item(itemName = "DDR5 32GB", price = 300))
+        database.itemInsert(Item(itemName = "Bed", price = 200))
+        database.itemInsert(Item(itemName = "Sofa", price = 100))
 
-            database.valueInsert(Value(itemId = 1, groupId = 2))
-            database.valueInsert(Value(itemId = 2, groupId = 2))
-            database.valueInsert(Value(itemId = 3, groupId = 2))
-            database.valueInsert(Value(itemId = 4, groupId = 2))
-            database.valueInsert(Value(itemId = 5, groupId = 3))
-            database.valueInsert(Value(itemId = 6, groupId = 3))
-            database.valueInsert(Value(itemId = 7, groupId = 3))
-            database.valueInsert(Value(itemId = 8, groupId = 4))
-            database.valueInsert(Value(itemId = 9, groupId = 4))
+        database.groupInsert(Group(groupName = "Home", higherGroupId = null))
+        database.groupInsert(Group(groupName = "PC", higherGroupId = 1))
+        database.groupInsert(Group(groupName = "CPU", higherGroupId = 2))
+        database.groupInsert(Group(groupName = "RAM", higherGroupId = 2))
+        database.groupInsert(Group(groupName = "House", higherGroupId = 1))
 
-            Timber.i("default insert completed")
-        }
+        database.valueInsert(Value(itemId = 1, groupId = 3))
+        database.valueInsert(Value(itemId = 2, groupId = 3))
+        database.valueInsert(Value(itemId = 3, groupId = 3))
+        database.valueInsert(Value(itemId = 4, groupId = 3))
+        database.valueInsert(Value(itemId = 5, groupId = 4))
+        database.valueInsert(Value(itemId = 6, groupId = 4))
+        database.valueInsert(Value(itemId = 7, groupId = 4))
+        database.valueInsert(Value(itemId = 8, groupId = 5))
+        database.valueInsert(Value(itemId = 9, groupId = 5))
+
+        Timber.i("default insert completed")
     }
 }

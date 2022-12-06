@@ -1,22 +1,28 @@
 package com.tabata.hoshiimon.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tabata.hoshiimon.R
 import com.tabata.hoshiimon.database.AppDatabase
 import com.tabata.hoshiimon.database.Group
 import com.tabata.hoshiimon.databinding.FragmentHomeBinding
+import timber.log.Timber
 
 class HomeFragment : Fragment() {
 
     lateinit var binding: FragmentHomeBinding
     lateinit var homeViewModel: HomeViewModel
+
+    init {
+        if (Timber.treeCount != 0) {
+            Timber.plant(Timber.DebugTree())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,15 +39,9 @@ class HomeFragment : Fragment() {
         binding.homeViewModel = homeViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        binding.groupName.text = getString(R.string.home)
-
-        homeViewModel.getDefaultGroup()
-
+        // グループリストの設定
         val groupListView = binding.groupListView
         groupListView.layoutManager = LinearLayoutManager(requireContext())
-
-        val itemListView = binding.itemListView
-        itemListView.layoutManager = LinearLayoutManager(requireContext())
 
         homeViewModel.groupDataSet.observe(viewLifecycleOwner) {
             val dataSet = homeViewModel.groupDataSet.value
@@ -50,13 +50,15 @@ class HomeFragment : Fragment() {
             listViewAdapter?.setOnItemClickListener(
                 object : GroupListViewAdapter.OnItemClickListener {
                     override fun onItemClick(group: Group) {
-                        setGroupName(group)
-                        homeViewModel.getHigherGroup(group)
-                        homeViewModel.getItemsByGroupId(group)
+                        homeViewModel.setCurrentGroup(group)
                     }
                 }
             )
         }
+
+        // アイテムリストの設定
+        val itemListView = binding.itemListView
+        itemListView.layoutManager = LinearLayoutManager(requireContext())
 
         homeViewModel.itemDataSet.observe(viewLifecycleOwner) {
             val dataSet = homeViewModel.itemDataSet.value
@@ -64,10 +66,21 @@ class HomeFragment : Fragment() {
             itemListView.adapter = listViewAdapter
         }
 
+        homeViewModel.currentGroup.observe(viewLifecycleOwner) {
+            homeViewModel.getLowerGroup(it)
+            homeViewModel.getItemsByGroupId(it)
+
+            binding.groupName.text = it.groupName
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(callback)
+
         return binding.root
     }
 
-    fun setGroupName(group: Group) {
-        binding.groupName.text = group.groupName
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            homeViewModel.getHigherGroup()
+        }
     }
 }
