@@ -62,6 +62,10 @@ class HomeViewModel(
         _currentGroup.value = group
     }
 
+    fun isRoot(): Boolean {
+        return currentGroup.value?.groupId == 1L
+    }
+
     private suspend fun setDefaultDB() {
         database.itemInsert(Item(itemName = "12600k", price = 200))
         database.itemInsert(Item(itemName = "12900k", price = 500))

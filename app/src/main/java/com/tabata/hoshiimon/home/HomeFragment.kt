@@ -1,5 +1,7 @@
 package com.tabata.hoshiimon.home
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -80,7 +82,17 @@ class HomeFragment : Fragment() {
 
     private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            homeViewModel.getHigherGroup()
+            if (!homeViewModel.isRoot()) {
+                homeViewModel.getHigherGroup()
+            } else {
+                AlertDialog.Builder(context)
+                    .setMessage("アプリを終了しますか")
+                    .setPositiveButton("Yes") { _, _, ->
+                        requireActivity().finish()
+                    }
+                    .setNegativeButton("No") { _, _ -> }
+                    .show()
+            }
         }
     }
 }
