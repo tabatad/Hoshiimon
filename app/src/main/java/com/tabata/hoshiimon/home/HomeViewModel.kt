@@ -1,10 +1,7 @@
 package com.tabata.hoshiimon.home
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.tabata.hoshiimon.database.AppDao
 import com.tabata.hoshiimon.database.Group
 import com.tabata.hoshiimon.database.Item
@@ -16,6 +13,10 @@ class HomeViewModel(
     private val database: AppDao,
     application: Application
 ) : AndroidViewModel(application) {
+
+    companion object {
+        const val ROOT = 1L
+    }
 
     private val _groupDataSet = MutableLiveData<List<Group>>()
     val groupDataSet: LiveData<List<Group>>
@@ -30,14 +31,19 @@ class HomeViewModel(
         get() = _currentGroup
 
     init {
-        Timber.plant(Timber.DebugTree())
+        if (Timber.treeCount == 0) {
+            Timber.plant(Timber.DebugTree())
+        }
 
         viewModelScope.launch {
             if (database.selectItem() == null) {
                 setDefaultDB()
             }
-            _currentGroup.value = database.getRootGroup()
         }
+    }
+
+    fun setDefaultGroup() {
+        setCurrentGroup(ROOT)
     }
 
     fun getLowerGroup(group: Group) {
@@ -58,8 +64,10 @@ class HomeViewModel(
         }
     }
 
-    fun setCurrentGroup(group: Group) {
-        _currentGroup.value = group
+    fun setCurrentGroup(group_id: Long) {
+        viewModelScope.launch {
+            _currentGroup.value = database.getGroupByGroupId(group_id)
+        }
     }
 
     fun isRoot(): Boolean {

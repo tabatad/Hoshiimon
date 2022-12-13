@@ -1,7 +1,6 @@
 package com.tabata.hoshiimon.home
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,19 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tabata.hoshiimon.database.AppDatabase
 import com.tabata.hoshiimon.database.Group
+import com.tabata.hoshiimon.database.Item
 import com.tabata.hoshiimon.databinding.FragmentHomeBinding
 import timber.log.Timber
 
 class HomeFragment : Fragment() {
 
-    lateinit var binding: FragmentHomeBinding
+    private lateinit var binding: FragmentHomeBinding
     lateinit var homeViewModel: HomeViewModel
 
     init {
-        if (Timber.treeCount != 0) {
+        if (Timber.treeCount == 0) {
             Timber.plant(Timber.DebugTree())
         }
     }
@@ -41,6 +42,10 @@ class HomeFragment : Fragment() {
         binding.homeViewModel = homeViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
+        if (homeViewModel.currentGroup.value == null) {
+            homeViewModel.setDefaultGroup()
+        }
+
         // グループリストの設定
         val groupListView = binding.groupListView
         groupListView.layoutManager = LinearLayoutManager(requireContext())
@@ -52,7 +57,7 @@ class HomeFragment : Fragment() {
             listViewAdapter?.setOnItemClickListener(
                 object : GroupListViewAdapter.OnItemClickListener {
                     override fun onItemClick(group: Group) {
-                        homeViewModel.setCurrentGroup(group)
+                        homeViewModel.setCurrentGroup(group.groupId)
                     }
                 }
             )
@@ -66,6 +71,16 @@ class HomeFragment : Fragment() {
             val dataSet = homeViewModel.itemDataSet.value
             val listViewAdapter = dataSet?.let { ItemListViewAdapter(it) }
             itemListView.adapter = listViewAdapter
+            listViewAdapter?.setOnItemClickListener(
+                object : ItemListViewAdapter.OnItemClickListener {
+                    override fun onItemClick(item: Item) {
+                        findNavController().navigate(
+                            HomeFragmentDirections
+                                .actionHomeFragmentToItemFragment(item.itemId)
+                        )
+                    }
+                }
+            )
         }
 
         homeViewModel.currentGroup.observe(viewLifecycleOwner) {
@@ -87,7 +102,7 @@ class HomeFragment : Fragment() {
             } else {
                 AlertDialog.Builder(context)
                     .setMessage("アプリを終了しますか")
-                    .setPositiveButton("Yes") { _, _, ->
+                    .setPositiveButton("Yes") { _, _ ->
                         requireActivity().finish()
                     }
                     .setNegativeButton("No") { _, _ -> }

@@ -28,7 +28,21 @@ class ItemListViewAdapter(private val dataSet: List<Item>):
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         viewHolder.itemName.text = dataSet[position].itemName
+
+        viewHolder.itemView.setOnClickListener {
+            listener.onItemClick(dataSet[position])
+        }
     }
 
     override fun getItemCount() = dataSet.size
+
+    private lateinit var listener: OnItemClickListener
+
+    interface OnItemClickListener {
+        fun onItemClick(item: Item)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
 }
