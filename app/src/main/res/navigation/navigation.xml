@@ -10,6 +10,7 @@
         android:name="com.tabata.hoshiimon.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
+
         <action
             android:id="@+id/action_homeFragment_to_itemFragment"
             app:destination="@id/itemFragment" />
@@ -24,5 +25,9 @@
         <argument
             android:name="item_id"
             app:argType="long" />
+
+        <action
+            android:id="@+id/action_itemFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

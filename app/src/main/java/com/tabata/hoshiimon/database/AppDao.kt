@@ -19,6 +19,9 @@ interface AppDao {
     @Query("SELECT * FROM 'group' WHERE higherGroupId IS NULL")
     suspend fun getRootGroup(): Group
 
+    @Query("SELECT * FROM 'group' WHERE groupId = :groupId")
+    suspend fun getGroupByGroupId(groupId: Long?): Group
+
     @Query("SELECT * FROM 'group' WHERE higherGroupId = :groupId")
     suspend fun getLowerGroup(groupId: Long?): List<Group>
 

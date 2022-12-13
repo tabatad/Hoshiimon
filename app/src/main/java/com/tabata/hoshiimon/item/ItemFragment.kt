@@ -5,10 +5,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.tabata.hoshiimon.database.AppDatabase
 import com.tabata.hoshiimon.databinding.FragmentItemBinding
+import timber.log.Timber
 
 class ItemFragment : Fragment() {
 
@@ -16,6 +19,12 @@ class ItemFragment : Fragment() {
     lateinit var itemViewModel: ItemViewModel
 
     private val args: ItemFragmentArgs by navArgs()
+
+    init {
+        if (Timber.treeCount == 0) {
+            Timber.plant(Timber.DebugTree())
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +48,17 @@ class ItemFragment : Fragment() {
             binding.itemPrice.text = it.price.toString()
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(callback)
+
         return binding.root
+    }
+
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            findNavController().navigate(
+                ItemFragmentDirections
+                    .actionItemFragmentToHomeFragment()
+            )
+        }
     }
 }
